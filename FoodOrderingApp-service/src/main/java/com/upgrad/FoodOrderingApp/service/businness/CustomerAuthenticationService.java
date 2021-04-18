@@ -4,9 +4,7 @@ import com.upgrad.FoodOrderingApp.service.dao.CustomerAuthDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
-import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
-import com.upgrad.FoodOrderingApp.service.exception.SignOutRestrictedException;
-import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
+import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -59,7 +57,7 @@ public class CustomerAuthenticationService {
      * @return CustomerAuthEntity access-token and singin response.
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerAuthEntity signin(final String contactNumber, final String password)
+    public CustomerAuthEntity login(final String contactNumber, final String password)
             throws AuthenticationFailedException {
 
         CustomerEntity customerEntity = customerDao.getContactByContactNumber(contactNumber);
@@ -97,7 +95,7 @@ public class CustomerAuthenticationService {
      * @return UserEntity : that user is signed out.
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity signout(final String accessToken) throws SignOutRestrictedException {
+    public CustomerEntity logout(final String accessToken) throws SignOutRestrictedException {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthByToken(accessToken);
         if (customerAuthEntity == null) {
             throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
@@ -115,5 +113,80 @@ public class CustomerAuthenticationService {
     // checks whether the email exist in the database
     private boolean isEmailInUse(final String email) {
         return customerDao.getUserByEmail(email) != null;
+    }
+
+    // checks whether the any field other than last name is empty
+    private boolean isAnyFieldEmptyExceptLastName(final String email) {
+        return customerDao.getUserByEmail(email) != null;
+    }
+
+    /**
+     * Update customer endpoint
+     *
+     * @param customerId : customerId of which you want to update
+     * @param accessToken : access-token for authorization
+     * @throws AuthorizationFailedException : If token is invalid you get authorization failed
+     *     response
+     * @throws UpdateCustomerException : If userid is invalid or not found
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity updateCustomer(final String customerId, final String firstName, final String lastName,
+                                          final String accessToken)
+            throws AuthorizationFailedException, UpdateCustomerException {
+        CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
+
+        if (customerAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not logged in");
+        }
+
+        if (customerAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is loged out");
+        }
+
+        CustomerEntity existingUser = this.customerDao.getCustomerById(customerId);
+
+        if (existingUser == null) {
+            throw new UpdateCustomerException(
+                    "USR-001", "User with entered uuid to be deleted does not exist");
+        }
+
+        existingUser.setFirstName(firstName);
+        existingUser.setLastName(lastName);
+        existingUser = this.customerDao.updateCustomerEntity(existingUser);
+        return existingUser;
+    }
+
+    /**
+     * Update customer endpoint
+     *
+     * @param customerId : customerId of which you want to update
+     * @param accessToken : access-token for authorization
+     * @throws AuthorizationFailedException : If token is invalid you get authorization failed
+     *     response
+     * @throws UpdateCustomerException : If userid is invalid or not found
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity updateCustomerPassword(final String customerId, final String password, final String accessToken)
+            throws AuthorizationFailedException, UpdateCustomerException {
+        CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
+
+        if (customerAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not logged in");
+        }
+
+        if (customerAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is loged out");
+        }
+
+        CustomerEntity existingUser = this.customerDao.getCustomerById(customerId);
+
+        if (existingUser == null) {
+            throw new UpdateCustomerException(
+                    "USR-001", "User with entered uuid to be deleted does not exist");
+        }
+
+        existingUser.setPassword(password);
+        existingUser = this.customerDao.updateCustomerEntity(existingUser);
+        return existingUser;
     }
 }

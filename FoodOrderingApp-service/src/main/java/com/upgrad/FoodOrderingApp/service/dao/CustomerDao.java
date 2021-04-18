@@ -79,8 +79,9 @@ public class CustomerDao {
      * @param updatedCustomerEntity : UserEntity body
      * @return updated response
      */
-    public void updateCustomerEntity(final CustomerEntity updatedCustomerEntity) {
+    public CustomerEntity updateCustomerEntity(CustomerEntity updatedCustomerEntity) {
         entityManager.merge(updatedCustomerEntity);
+        return updatedCustomerEntity;
     }
 
     /**
