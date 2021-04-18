@@ -162,7 +162,7 @@ public class CustomerController {
 
         // Authorize user and edit the question with Uuid passed
         CustomerEntity customerEntity =
-                customerAuthenticationService.updateCustomerPassword(customerUuid, newPassword, authorization);
+                customerAuthenticationService.updateCustomerPassword(customerUuid, newPassword, oldPassword, authorization);
 
         // Set the Uuid and status of edited question in response
         UpdatePasswordResponse updatePasswordResponse =

@@ -189,16 +189,31 @@ public class CustomerAuthenticationService {
      * @throws UpdateCustomerException : If userid is invalid or not found
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomerPassword(final String customerId, final String password, final String accessToken)
+    public CustomerEntity updateCustomerPassword(final String customerId, final String password, final String oldPassword, final String accessToken)
             throws AuthorizationFailedException, UpdateCustomerException {
         CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
 
-        if (customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001", "User has not logged in");
+        if(password.length() == 0 || oldPassword.length() ==0){
+            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        }
+        if(customerAuthEntity == null){
+            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
 
-        if (customerAuthEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002", "User is loged out");
+        if (customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
+            throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
+        }
+
+        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
+        }
+
+        if(!(isStrongPassword(password))){
+            throw new UpdateCustomerException("UCR-001", "Weak password!");
+        }
+
+        if(!oldPassword.equals(getCurrentPassword(accessToken))){
+            throw new UpdateCustomerException("UCR-004", "Incorrect old password!");
         }
 
         CustomerEntity existingUser = this.customerDao.getCustomerById(customerId);
@@ -290,5 +305,15 @@ public class CustomerAuthenticationService {
         }else{
             return false;
         }
+    }
+
+    // checks whether the authorization is in correct format in the database
+    private String getCurrentPassword(final String authorization) {
+        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+        String decodedText = new String(decode);
+        String[] decodedArray = decodedText.split(":");
+        //String contactNumber = decodedArray[0];
+        String password = decodedArray[1];
+        return password;
     }
 }
