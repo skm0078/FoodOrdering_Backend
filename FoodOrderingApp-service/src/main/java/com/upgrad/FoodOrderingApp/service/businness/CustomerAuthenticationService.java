@@ -124,10 +124,10 @@ public class CustomerAuthenticationService {
         if (customerAuthEntity == null) {
             throw new SignOutRestrictedException("SGR-001", "Customer is not Logged in.");
         }
-        if(customerAuthEntity != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))){
+        if(customerAuthEntity != null && customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))){
             throw new SignOutRestrictedException("SGR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
-        if(customerAuthEntity != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
             throw new SignOutRestrictedException("SGR-003", "Your session is expired. Log in again to access this endpoint.");
         }
         customerAuthEntity.setLogoutAt(ZonedDateTime.now());
@@ -150,12 +150,20 @@ public class CustomerAuthenticationService {
             throws AuthorizationFailedException, UpdateCustomerException {
         CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
 
-        if (customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001", "User has not logged in");
+        if(firstName.length() == 0){
+            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
         }
 
-        if (customerAuthEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002", "User is loged out");
+        if (customerAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
+        }
+
+        if (customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
+            throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
+        }
+
+        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
         CustomerEntity existingUser = this.customerDao.getCustomerById(customerId);
