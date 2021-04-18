@@ -11,7 +11,12 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 @Service
 public class CustomerAuthenticationService {
@@ -31,15 +36,33 @@ public class CustomerAuthenticationService {
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity signup(CustomerEntity customerEntity) throws SignUpRestrictedException {
+        // Validate if contact number is not used
         if (isContactNumberInUse(customerEntity.getContactNumber())) {
             throw new SignUpRestrictedException(
                     "SGR-001", "This contact number is already registered! Try other contact number.");
         }
 
-        if (isEmailInUse(customerEntity.getEmail())) {
+        if ((customerEntity.getFirstName()==null)||(customerEntity.getEmail()==null)||
+                (customerEntity.getContactNumber()==null)||(customerEntity.getPassword()==null)) {
             throw new SignUpRestrictedException(
-                    "SGR-002", "This user has already been registered, try with any other emailId");
+                    "SGR-005", "Except last name all fields should be filled");
         }
+
+        if(!(isValidEmail(customerEntity.getEmail()))){
+            throw new SignUpRestrictedException(
+                    "SGR-002", "Invalid email-id format!");
+        }
+
+        if(!(isValidContactNumber(customerEntity.getContactNumber()))){
+            throw new SignUpRestrictedException(
+                    "SGR-003", "Invalid contact number!");
+        }
+
+        if(!(isStrongPassword(customerEntity.getPassword()))){
+            throw new SignUpRestrictedException(
+                    "SGR-004", "Weak password!");
+        }
+
         // Assign a UUID to the user that is being created.
         customerEntity.setUuid(UUID.randomUUID().toString());
         // Assign encrypted password and salt to the user that is being created.
@@ -103,21 +126,6 @@ public class CustomerAuthenticationService {
         customerAuthEntity.setLogoutAt(ZonedDateTime.now());
         customerAuthDao.updateCustomerAuth(customerAuthEntity);
         return customerAuthEntity.getCustomerEntity();
-    }
-
-    // checks whether the contactNumber exist in the database
-    private boolean isContactNumberInUse(final String contactNumber) {
-        return customerDao.getContactByContactNumber(contactNumber) != null;
-    }
-
-    // checks whether the email exist in the database
-    private boolean isEmailInUse(final String email) {
-        return customerDao.getUserByEmail(email) != null;
-    }
-
-    // checks whether the any field other than last name is empty
-    private boolean isAnyFieldEmptyExceptLastName(final String email) {
-        return customerDao.getUserByEmail(email) != null;
     }
 
     /**
@@ -188,5 +196,77 @@ public class CustomerAuthenticationService {
         existingUser.setPassword(password);
         existingUser = this.customerDao.updateCustomerEntity(existingUser);
         return existingUser;
+    }
+
+    // checks whether the contactNumber exist in the database
+    private boolean isContactNumberInUse(final String contactNumber) {
+        return customerDao.getContactByContactNumber(contactNumber) != null;
+    }
+
+    // checks whether the email exist in the database
+    private boolean isEmailInUse(final String email) {
+        return customerDao.getUserByEmail(email) != null;
+    }
+
+    // checks whether the any field other than last name is empty
+    private boolean isAnyFieldEmptyExceptLastName(final String email) {
+        return customerDao.getUserByEmail(email) != null;
+    }
+
+    // Checks whether email is in correct format
+    private boolean isValidEmail(final String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (email == null)
+            return false;
+        return pat.matcher(email).matches();
+    }
+
+    // Checks whether contact Number is in correct format
+    private boolean isValidContactNumber(final String contactNumber) {
+        String contactNumberRegex = "^\\d{10}$";
+
+        Pattern pat = Pattern.compile(contactNumberRegex);
+        if (contactNumber == null)
+            return false;
+        return pat.matcher(contactNumber).matches();
+    }
+
+    // Check if password is strong
+    private boolean isStrongPassword(final String input)
+    {
+        boolean isPasswordStrong = false;
+
+        // Checking lower alphabet in string
+        int n = input.length();
+        boolean hasLower = false, hasUpper = false,
+                hasDigit = false, specialChar = false;
+        Set<Character> set = new HashSet<Character>(
+                Arrays.asList('!', '@', '#', '$', '%', '^', '&',
+                        '*'));
+        for (char i : input.toCharArray())
+        {
+            if (Character.isLowerCase(i))
+                hasLower = true;
+            if (Character.isUpperCase(i))
+                hasUpper = true;
+            if (Character.isDigit(i))
+                hasDigit = true;
+            if (set.contains(i))
+                specialChar = true;
+        }
+
+        // Strength of password
+        System.out.print("Strength of password:- ");
+        if (hasDigit && hasUpper && specialChar && (n >= 8)){
+            isPasswordStrong = true;
+        } else{
+            isPasswordStrong = false;
+        }
+        return isPasswordStrong;
     }
 }
