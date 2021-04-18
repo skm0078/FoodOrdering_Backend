@@ -122,7 +122,13 @@ public class CustomerAuthenticationService {
     public CustomerEntity logout(final String accessToken) throws SignOutRestrictedException {
         CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthByToken(accessToken);
         if (customerAuthEntity == null) {
-            throw new SignOutRestrictedException("SGR-001", "User is not Signed in");
+            throw new SignOutRestrictedException("SGR-001", "Customer is not Logged in.");
+        }
+        if(customerAuthEntity != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))){
+            throw new SignOutRestrictedException("SGR-002", "Customer is logged out. Log in again to access this endpoint.");
+        }
+        if(customerAuthEntity != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+            throw new SignOutRestrictedException("SGR-003", "Your session is expired. Log in again to access this endpoint.");
         }
         customerAuthEntity.setLogoutAt(ZonedDateTime.now());
         customerAuthDao.updateCustomerAuth(customerAuthEntity);

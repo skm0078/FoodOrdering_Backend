@@ -57,7 +57,7 @@ public class CustomerController {
      * This method is for a customer to login.
      *
      * @param authorization for the basic authentication
-     * @return Login response which has userId and access-token in response header.
+     * @return Login response which has customerId and access-token in response header.
      * @throws AuthenticationFailedException : if username or password is invalid
      */
     @RequestMapping(
@@ -78,7 +78,7 @@ public class CustomerController {
 
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setId(customerAuthEntity.getCustomerEntity().getUuid());
-        loginResponse.setMessage("SIGNED IN SUCCESSFULLY");
+        loginResponse.setMessage("LOGGED IN SUCCESSFULLY");
 
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
     }
@@ -98,7 +98,7 @@ public class CustomerController {
             @RequestHeader("authorization") final String acessToken) throws SignOutRestrictedException {
         CustomerEntity customerEntity = customerAuthenticationService.logout(acessToken);
         LogoutResponse logoutResponse =
-                new LogoutResponse().id(customerEntity.getUuid()).message("SIGNED OUT SUCCESSFULLY");
+                new LogoutResponse().id(customerEntity.getUuid()).message("LOGGED OUT SUCCESSFULLY");
         return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
     }
 
@@ -114,7 +114,7 @@ public class CustomerController {
      */
     @RequestMapping(
             method = RequestMethod.PUT,
-            path = "/customer/{customerId}",
+            path = "/customer",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> updateCustomerDetails(
