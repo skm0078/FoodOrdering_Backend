@@ -11,13 +11,13 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "users")
+@Table(name = "customer")
 @NamedQueries({
         @NamedQuery(
-                name = "userByUserName",
-                query = "select u from CustomerEntity u where u.userName=:userName"),
-        @NamedQuery(name = "userByEmail", query = "select u from CustomerEntity u where u.email=:email"),
-        @NamedQuery(name = "userByUserId", query = "select u from CustomerEntity u where u.uuid=:userId")
+                name = "customerByCustomerContact",
+                query = "select u from CustomerEntity u where u.contactNumber=:contactNumber"),
+        @NamedQuery(name = "customerByEmail", query = "select u from CustomerEntity u where u.email=:email"),
+        @NamedQuery(name = "customerByCustomerId", query = "select u from CustomerEntity u where u.uuid=:customerId")
 })
 public class CustomerEntity implements Serializable {
 
@@ -41,17 +41,12 @@ public class CustomerEntity implements Serializable {
     @Size(max = 30)
     private String lastName;
 
-    @Column(name = "username")
-    @NotNull
-    @Size(max = 30)
-    private String userName;
-
     @Column(name = "email")
     @NotNull
     @Size(max = 50)
     private String email;
 
-    @Column(name = "contactnumber")
+    @Column(name = "contact_number")
     @Size(max = 30)
     private String contactNumber;
 
@@ -97,14 +92,6 @@ public class CustomerEntity implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
     }
 
     public String getEmail() {

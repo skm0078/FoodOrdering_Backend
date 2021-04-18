@@ -11,49 +11,51 @@ import javax.persistence.PersistenceContext;
 public class CustomerDao {
     @PersistenceContext
     private EntityManager entityManager;
+
     /**
-     * Fetch a single user by id
+     * Fetch a single customer by id
      *
-     * @param userId : to retch details
-     * @return User details
+     * @param customerId : to retch details
+     * @return Customer details
      */
-    public CustomerEntity getUserById(final String userId) {
+    public CustomerEntity getCustomerById(final String customerId) {
         try {
             return entityManager
-                    .createNamedQuery("userByUserId", CustomerEntity.class)
-                    .setParameter("userId", userId)
+                    .createNamedQuery("customerByCustomerId", CustomerEntity.class)
+                    .setParameter("customerId", customerId)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
-    }
-    /**
-     * create user in database.
-     *
-     * @param userEntity : the userEntity body
-     * @return User details
-     */
-    public CustomerEntity createUser(CustomerEntity userEntity) {
-        entityManager.persist(userEntity);
-        return userEntity;
     }
 
     /**
-     * Method to get user by name
+     * Fetch a single customer by customer Number
      *
-     * @param userName : username for which to be pulled
-     * @return user details
+     * @param customerContact : to retch details
+     * @return User details
      */
-    public CustomerEntity getUserByUserName(final String userName) {
+    public CustomerEntity getContactByContactNumber(final String customerContact) {
         try {
             return entityManager
-                    .createNamedQuery("userByUserName", CustomerEntity.class)
-                    .setParameter("userName", userName)
+                    .createNamedQuery("customerByCustomerContact", CustomerEntity.class)
+                    .setParameter("contactNumber", customerContact)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
     }
+    /**
+     * create customer in database.
+     *
+     * @param customerEntity : the customerEntity body
+     * @return Customer details
+     */
+    public CustomerEntity createUser(CustomerEntity customerEntity) {
+        entityManager.persist(customerEntity);
+        return customerEntity;
+    }
+
     /**
      * Method to get user by email
      *
@@ -63,7 +65,7 @@ public class CustomerDao {
     public CustomerEntity getUserByEmail(final String email) {
         try {
             return entityManager
-                    .createNamedQuery("userByEmail", CustomerEntity.class)
+                    .createNamedQuery("customerByEmail", CustomerEntity.class)
                     .setParameter("email", email)
                     .getSingleResult();
         } catch (NoResultException nre) {
@@ -72,23 +74,23 @@ public class CustomerDao {
     }
 
     /**
-     * Method to update user in database
+     * Method to update customer in database
      *
-     * @param updatedUserEntity : UserEntity body
+     * @param updatedCustomerEntity : UserEntity body
      * @return updated response
      */
-    public void updateUserEntity(final CustomerEntity updatedUserEntity) {
-        entityManager.merge(updatedUserEntity);
+    public void updateCustomerEntity(final CustomerEntity updatedCustomerEntity) {
+        entityManager.merge(updatedCustomerEntity);
     }
 
     /**
-     * Method to delete user by id
+     * Method to delete customer by id
      *
-     * @param userId : username which we want to delete
+     * @param customerId : customer which we want to delete
      * @return deleted response
      */
-    public CustomerEntity deleteUser(final String userId) {
-        CustomerEntity deleteUser = getUserById(userId);
+    public CustomerEntity deleteUser(final String customerId) {
+        CustomerEntity deleteUser = getCustomerById(customerId);
         if (deleteUser != null) {
             this.entityManager.remove(deleteUser);
         }

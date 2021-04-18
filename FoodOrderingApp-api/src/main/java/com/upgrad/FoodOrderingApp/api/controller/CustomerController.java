@@ -3,9 +3,11 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.SignupCustomerRequest;
 import com.upgrad.FoodOrderingApp.api.model.SignupCustomerResponse;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerAuthenticationService;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,14 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
 
     @Autowired
-    private UserAuthenticationService userAuthService;
+    private CustomerAuthenticationService customerAuthenticationService;
 
     /**
-     * This method is for user signup. This method receives the object of SignupUserRequest type with
+     * This method is for customer signup. This method receives the object of SignupCustomerRequest type with
      * its attributes being set.
      *
-     * @return SignupUserResponse - UUID of the user created.
-     * @throws SignUpRestrictedException - if the username or email already exist in the database.
+     * @return SignupCustomerResponse - UUID of the user created.
+     * @throws SignUpRestrictedException - if the contactNumber or email already exist in the database.
      */
 
    @RequestMapping(
@@ -42,11 +44,11 @@ public class CustomerController {
         customerEntity.setPassword(signupCustomerRequest.getPassword());
         customerEntity.setContactNumber(signupCustomerRequest.getContactNumber());
 
-        CustomerEntity createdCustomerEntity = userAuthService.signup(userEntity);
-        SignupUserResponse userResponse =
-                new SignupUserResponse()
-                        .id(createdUserEntity.getUuid())
-                        .status("USER SUCCESSFULLY REGISTERED");
-        return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
+        CustomerEntity createdCustomerEntity = customerAuthenticationService.signup(customerEntity);
+       SignupCustomerResponse userResponse =
+                new SignupCustomerResponse()
+                        .id(createdCustomerEntity.getUuid())
+                        .status("CUSTOMER SUCCESSFULLY REGISTERED");
+        return new ResponseEntity<SignupCustomerResponse>(userResponse, HttpStatus.CREATED);
     }
 }
