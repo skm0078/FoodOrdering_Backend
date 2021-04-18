@@ -17,8 +17,8 @@ import javax.validation.constraints.Size;
         @NamedQuery(
                 name = "addressById",
                 query = "select u from AddressEntity u where u.id=:id"),
-        @NamedQuery(name = "addressByCity", query = "select u from AddressEntity u where u.city=:city"),
-        @NamedQuery(name = "addressByPincode", query = "select u from AddressEntity u where u.pincode=:pincode")
+        @NamedQuery(name = "allAddress", query = "select u from AddressEntity u"),
+        @NamedQuery(name = "addressByUuid", query = "select u from AddressEntity u where u.uuid=:Uuid")
 })
 public class AddressEntity {
 
@@ -55,7 +55,7 @@ public class AddressEntity {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "state_id")
-    private CustomerEntity customerEntity;
+    private StateEntity stateEntity;
 
     @Column(name = "active")
     @NotNull
@@ -109,12 +109,12 @@ public class AddressEntity {
         this.pincode = pincode;
     }
 
-    public CustomerEntity getCustomerEntity() {
-        return customerEntity;
+    public StateEntity getStateEntity() {
+        return stateEntity;
     }
 
-    public void setCustomerEntity(CustomerEntity customerEntity) {
-        this.customerEntity = customerEntity;
+    public void setStateEntity(StateEntity stateEntity) {
+        this.stateEntity = stateEntity;
     }
 
     public Integer getActive() {

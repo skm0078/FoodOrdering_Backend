@@ -3,6 +3,7 @@ package com.upgrad.FoodOrderingApp.service.businness;
 import com.upgrad.FoodOrderingApp.service.dao.*;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
+import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
@@ -65,10 +68,93 @@ public class AddressService {
         if (!isStateUuidInDB(stateUuid)) {
             throw new AddressNotFoundException("ANF-002", "No state by this id");
         }
-
-        addressEntity.setFlatNumber(flatBuildingName);
+        // Assign a UUID to the user that is being created.
+        addressEntity.setUuid(UUID.randomUUID().toString());
 
         return addressDao.createAddress(addressEntity);
+    }
+
+    /**
+     * Business logic to authorize user who wants to get a list of all address and return list of
+     * addresses
+     *
+     * @param authorization
+     * @return list of all address
+     * @throws AuthorizationFailedException
+     */
+    public List<AddressEntity> getAllAddresses(final String authorization)
+            throws AuthorizationFailedException {
+        CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthByToken(authorization);
+        if (customerAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }
+
+        // Retrieve logout_at attribute value of UserAuthEntity to check if user has already signed
+        // out
+        ZonedDateTime logoutAt = customerAuthEntity.getLogoutAt();
+        if (logoutAt != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get all questions");
+        }
+
+        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
+        }
+
+        return addressDao.getAllAddress();
+    }
+
+    /**
+     * Business logic to authorize user and delete question
+     *
+     * @param accessToken
+     * @param addressId
+     * @return deleted address
+     * @throws AuthorizationFailedException
+     * @throws AddressNotFoundException
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    public AddressEntity deleteAddress(final String accessToken, final String addressId)
+            throws AuthorizationFailedException, AddressNotFoundException {
+        CustomerAuthEntity customerAuthEntity = customerAuthDao.getCustomerAuthByToken(accessToken);
+
+        if (customerAuthEntity == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        } else if (customerAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException(
+                    "ATHR-002", "User is signed out.Sign in first to get all questions");
+        }else if(customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
+        }
+
+        AddressEntity addressEntity = addressDao.getAddressByUuid(addressId);
+        if (addressEntity == null) {
+            throw new AddressNotFoundException("ANF-003", "No address by this id");
+        }
+
+        if (!addressEntity.getCustomerEntity().getUuid().equals(customerAuthEntity.getCustomerEntity().getUuid())) {
+            throw new AuthorizationFailedException(
+                    "ATHR-004", "You are not authorized to view/update/delete any one else's address ");
+        }
+        if(addressId.length()==0){
+            throw new AddressNotFoundException("ANF-005","Address id can not be empty");
+        }
+
+
+        addressDao.deleteAddress(addressEntity);
+        return addressEntity;
+    }
+
+    /**
+     * Business logic to authorize user who wants to get a list of all address and return list of
+     * addresses
+     *
+     * @param
+     * @return list of all states
+     * @throws
+     */
+    public List<StateEntity> getAllStates() {
+
+        return stateDao.getAllStates();
     }
 
     // Checks whether pinCode is in correct format
