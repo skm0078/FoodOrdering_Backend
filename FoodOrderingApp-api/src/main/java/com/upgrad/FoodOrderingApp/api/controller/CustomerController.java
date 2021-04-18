@@ -71,7 +71,7 @@ public class CustomerController {
         byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":");
-        CustomerAuthEntity customerAuthEntity = customerAuthenticationService.login(decodedArray[0], decodedArray[1]);
+        CustomerAuthEntity customerAuthEntity = customerAuthenticationService.login(authorization, decodedArray[0], decodedArray[1]);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token", customerAuthEntity.getAccessToken());

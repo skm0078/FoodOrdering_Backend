@@ -11,10 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -72,16 +69,20 @@ public class CustomerAuthenticationService {
         return customerDao.createUser(customerEntity);
     }
     /**
-     * the signin user method
+     * the login customer method
      *
      * @param contactNumber : Contact Number that you want to signin
      * @param password : Password of user
      * @throws AuthenticationFailedException : If user not found or invalid password
-     * @return CustomerAuthEntity access-token and singin response.
+     * @return CustomerAuthEntity access-token and login response.
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerAuthEntity login(final String contactNumber, final String password)
+    public CustomerAuthEntity login(final String authorization, final String contactNumber, final String password)
             throws AuthenticationFailedException {
+
+        if(!(isAuthorizationInCorrectFormat(authorization))){
+            throw new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
+        }
 
         CustomerEntity customerEntity = customerDao.getContactByContactNumber(contactNumber);
         if (customerEntity == null) {
@@ -90,7 +91,7 @@ public class CustomerAuthenticationService {
         final String encryptedPassword =
                 passwordCryptographyProvider.encrypt(password, customerEntity.getSalt());
         if (!encryptedPassword.equals(customerEntity.getPassword())) {
-            throw new AuthenticationFailedException("ATH-002", "Password failed");
+            throw new AuthenticationFailedException("ATH-002", "Invalid Credentials");
         }
 
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
@@ -203,16 +204,6 @@ public class CustomerAuthenticationService {
         return customerDao.getContactByContactNumber(contactNumber) != null;
     }
 
-    // checks whether the email exist in the database
-    private boolean isEmailInUse(final String email) {
-        return customerDao.getUserByEmail(email) != null;
-    }
-
-    // checks whether the any field other than last name is empty
-    private boolean isAnyFieldEmptyExceptLastName(final String email) {
-        return customerDao.getUserByEmail(email) != null;
-    }
-
     // Checks whether email is in correct format
     private boolean isValidEmail(final String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
@@ -268,5 +259,22 @@ public class CustomerAuthenticationService {
             isPasswordStrong = false;
         }
         return isPasswordStrong;
+    }
+
+    // checks whether the authorization is in correct format in the database
+    private boolean isAuthorizationInCorrectFormat(final String authorization) {
+        boolean containsBasic = false;
+        containsBasic = authorization.contains("Basic ");
+        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+        String decodedText = new String(decode);
+        String[] decodedArray = decodedText.split(":");
+        //String contactNumber = decodedArray[0]; String password = decodedArray[1];
+        boolean validContact = isValidContactNumber(decodedArray[0]);
+        boolean validPassword = isStrongPassword(decodedArray[1]);
+        if(containsBasic && validContact && validPassword){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
