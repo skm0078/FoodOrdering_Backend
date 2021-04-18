@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Repository
-public class CustomerAddressDao {
+public class StateDao {
     @PersistenceContext
     private EntityManager entityManager;
 }

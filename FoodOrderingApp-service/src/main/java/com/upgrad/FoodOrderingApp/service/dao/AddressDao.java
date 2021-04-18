@@ -6,7 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Repository
-public class CustomerAddressDao {
+public class AddressDao {
+
     @PersistenceContext
     private EntityManager entityManager;
 }
