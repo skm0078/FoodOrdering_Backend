@@ -17,8 +17,12 @@ import javax.validation.constraints.Size;
         @NamedQuery(
                 name = "addressById",
                 query = "select u from AddressEntity u where u.id=:id"),
-        @NamedQuery(name = "allAddress", query = "select u from AddressEntity u"),
-        @NamedQuery(name = "addressByUuid", query = "select u from AddressEntity u where u.uuid=:Uuid")
+        @NamedQuery(name = "allAddress",
+                query = "select u from AddressEntity u"),
+        @NamedQuery(name = "addressByUuid",
+                query = "select u from AddressEntity u where u.uuid=:Uuid"),
+        @NamedQuery(name = "stateByAddress",
+                query = "select u.stateEntity from AddressEntity u where u.uuid=:Uuid")
 })
 public class AddressEntity {
 

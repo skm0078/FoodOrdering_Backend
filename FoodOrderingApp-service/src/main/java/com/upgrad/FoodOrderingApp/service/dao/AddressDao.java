@@ -1,7 +1,7 @@
 package com.upgrad.FoodOrderingApp.service.dao;
 
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
+import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -64,5 +64,24 @@ public class AddressDao {
 
         entityManager.remove(addressEntity);
     }
+
+    /**
+     * Fetch a state by address id
+     *
+     * @param addressUuid : to retch details
+     * @return State Entity details
+     */
+    public StateEntity getStateById(final String addressUuid) {
+        try {
+            return entityManager
+                    .createNamedQuery("stateByAddress", AddressEntity.class)
+                    .setParameter("Uuid", addressUuid)
+                    .getSingleResult().getStateEntity();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
+
 
 }
