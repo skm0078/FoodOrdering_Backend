@@ -39,23 +39,23 @@ public class CustomerAuthenticationService {
                     "SGR-001", "This contact number is already registered! Try other contact number.");
         }
 
-        if ((customerEntity.getFirstName()==null)||(customerEntity.getEmail()==null)||
-                (customerEntity.getContactNumber()==null)||(customerEntity.getPassword()==null)) {
+        if ((customerEntity.getFirstName() == null) || (customerEntity.getEmail() == null) ||
+                (customerEntity.getContactNumber() == null) || (customerEntity.getPassword() == null)) {
             throw new SignUpRestrictedException(
                     "SGR-005", "Except last name all fields should be filled");
         }
 
-        if(!(isValidEmail(customerEntity.getEmail()))){
+        if (!(isValidEmail(customerEntity.getEmail()))) {
             throw new SignUpRestrictedException(
                     "SGR-002", "Invalid email-id format!");
         }
 
-        if(!(isValidContactNumber(customerEntity.getContactNumber()))){
+        if (!(isValidContactNumber(customerEntity.getContactNumber()))) {
             throw new SignUpRestrictedException(
                     "SGR-003", "Invalid contact number!");
         }
 
-        if(!(isStrongPassword(customerEntity.getPassword()))){
+        if (!(isStrongPassword(customerEntity.getPassword()))) {
             throw new SignUpRestrictedException(
                     "SGR-004", "Weak password!");
         }
@@ -68,19 +68,20 @@ public class CustomerAuthenticationService {
         customerEntity.setPassword(encryptedText[1]);
         return customerDao.createUser(customerEntity);
     }
+
     /**
      * the login customer method
      *
      * @param contactNumber : Contact Number that you want to signin
-     * @param password : Password of user
-     * @throws AuthenticationFailedException : If user not found or invalid password
+     * @param password      : Password of user
      * @return CustomerAuthEntity access-token and login response.
+     * @throws AuthenticationFailedException : If user not found or invalid password
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAuthEntity login(final String authorization, final String contactNumber, final String password)
             throws AuthenticationFailedException {
 
-        if(!(isAuthorizationInCorrectFormat(authorization))){
+        if (!(isAuthorizationInCorrectFormat(authorization))) {
             throw new AuthenticationFailedException("ATH-003", "Incorrect format of decoded customer name and password");
         }
 
@@ -115,8 +116,8 @@ public class CustomerAuthenticationService {
      * The signout method
      *
      * @param accessToken : required to signout the user
-     * @throws SignOutRestrictedException : if the access-token is not found in the DB.
      * @return UserEntity : that user is signed out.
+     * @throws SignOutRestrictedException : if the access-token is not found in the DB.
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity logout(final String accessToken) throws SignOutRestrictedException {
@@ -124,10 +125,10 @@ public class CustomerAuthenticationService {
         if (customerAuthEntity == null) {
             throw new SignOutRestrictedException("SGR-001", "Customer is not Logged in.");
         }
-        if(customerAuthEntity != null && customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getLogoutAt() != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
             throw new SignOutRestrictedException("SGR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
-        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new SignOutRestrictedException("SGR-003", "Your session is expired. Log in again to access this endpoint.");
         }
         customerAuthEntity.setLogoutAt(ZonedDateTime.now());
@@ -138,19 +139,19 @@ public class CustomerAuthenticationService {
     /**
      * Update customer endpoint
      *
-     * @param customerId : customerId of which you want to update
+     * @param customerId  : customerId of which you want to update
      * @param accessToken : access-token for authorization
      * @throws AuthorizationFailedException : If token is invalid you get authorization failed
-     *     response
-     * @throws UpdateCustomerException : If userid is invalid or not found
+     *                                      response
+     * @throws UpdateCustomerException      : If userid is invalid or not found
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity updateCustomer(final String customerId, final String firstName, final String lastName,
-                                          final String accessToken)
+                                         final String accessToken)
             throws AuthorizationFailedException, UpdateCustomerException {
         CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
 
-        if(firstName.length() == 0){
+        if (firstName.length() == 0) {
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
         }
 
@@ -158,11 +159,11 @@ public class CustomerAuthenticationService {
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
 
-        if (customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
+        if (customerAuthEntity.getLogoutAt() != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
 
-        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
@@ -182,37 +183,37 @@ public class CustomerAuthenticationService {
     /**
      * Update customer endpoint
      *
-     * @param customerId : customerId of which you want to update
+     * @param customerId  : customerId of which you want to update
      * @param accessToken : access-token for authorization
      * @throws AuthorizationFailedException : If token is invalid you get authorization failed
-     *     response
-     * @throws UpdateCustomerException : If userid is invalid or not found
+     *                                      response
+     * @throws UpdateCustomerException      : If userid is invalid or not found
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity updateCustomerPassword(final String customerId, final String password, final String oldPassword, final String accessToken)
             throws AuthorizationFailedException, UpdateCustomerException {
         CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
 
-        if(password.length() == 0 || oldPassword.length() ==0){
-            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        if (password.length() == 0 || oldPassword.length() == 0) {
+            throw new UpdateCustomerException("UCR-003", "No field should be empty");
         }
-        if(customerAuthEntity == null){
+        if (customerAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
 
-        if (customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
+        if (customerAuthEntity.getLogoutAt() != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
 
-        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
-        if(!(isStrongPassword(password))){
+        if (!(isStrongPassword(password))) {
             throw new UpdateCustomerException("UCR-001", "Weak password!");
         }
 
-        if(!oldPassword.equals(getCurrentPassword(accessToken))){
+        if (!oldPassword.equals(getCurrentPassword(accessToken))) {
             throw new UpdateCustomerException("UCR-004", "Incorrect old password!");
         }
 
@@ -235,7 +236,7 @@ public class CustomerAuthenticationService {
 
     // Checks whether email is in correct format
     private boolean isValidEmail(final String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
                 "A-Z]{2,7}$";
@@ -257,8 +258,7 @@ public class CustomerAuthenticationService {
     }
 
     // Check if password is strong
-    private boolean isStrongPassword(final String input)
-    {
+    private boolean isStrongPassword(final String input) {
         boolean isPasswordStrong = false;
 
         // Checking lower alphabet in string
@@ -268,8 +268,7 @@ public class CustomerAuthenticationService {
         Set<Character> set = new HashSet<Character>(
                 Arrays.asList('!', '@', '#', '$', '%', '^', '&',
                         '*'));
-        for (char i : input.toCharArray())
-        {
+        for (char i : input.toCharArray()) {
             if (Character.isLowerCase(i))
                 hasLower = true;
             if (Character.isUpperCase(i))
@@ -282,9 +281,9 @@ public class CustomerAuthenticationService {
 
         // Strength of password
         System.out.print("Strength of password:- ");
-        if (hasDigit && hasUpper && specialChar && (n >= 8)){
+        if (hasDigit && hasUpper && specialChar && (n >= 8)) {
             isPasswordStrong = true;
-        } else{
+        } else {
             isPasswordStrong = false;
         }
         return isPasswordStrong;
@@ -300,9 +299,9 @@ public class CustomerAuthenticationService {
         //String contactNumber = decodedArray[0]; String password = decodedArray[1];
         boolean validContact = isValidContactNumber(decodedArray[0]);
         boolean validPassword = isStrongPassword(decodedArray[1]);
-        if(containsBasic && validContact && validPassword){
+        if (containsBasic && validContact && validPassword) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }

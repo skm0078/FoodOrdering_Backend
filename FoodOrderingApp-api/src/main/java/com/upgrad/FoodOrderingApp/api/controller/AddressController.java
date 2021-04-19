@@ -2,7 +2,6 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.AddressService;
-import com.upgrad.FoodOrderingApp.service.dao.AddressDao;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
@@ -86,8 +85,6 @@ public class AddressController {
 
         // create stateList arrayList to store all address in StateList form
         List<AddressList> addressListArrayList = new ArrayList<>();
-
-        AddressDao addressDao = new AddressDao();
 
         // Extract Uuid and content from each QuestionResponse entity
         for (AddressEntity address : allAddresses) {

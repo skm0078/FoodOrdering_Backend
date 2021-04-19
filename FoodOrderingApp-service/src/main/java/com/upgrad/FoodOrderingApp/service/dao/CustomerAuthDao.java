@@ -12,6 +12,7 @@ public class CustomerAuthDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
     /**
      * get Customer auth by token
      *
@@ -28,6 +29,7 @@ public class CustomerAuthDao {
             return null;
         }
     }
+
     /**
      * Persists customer auth entity in database.
      *
@@ -38,6 +40,7 @@ public class CustomerAuthDao {
         entityManager.persist(customerAuthEntity);
         return customerAuthEntity;
     }
+
     /**
      * Update CustomerAuthEntity in Database
      *

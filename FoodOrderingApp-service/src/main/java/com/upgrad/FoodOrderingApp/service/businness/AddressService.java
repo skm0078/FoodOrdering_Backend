@@ -32,11 +32,11 @@ public class AddressService {
     /**
      * Update customer endpoint
      *
-     * @param stateUuid : stateId of which you want to update and all other parameters
+     * @param stateUuid   : stateId of which you want to update and all other parameters
      * @param accessToken : access-token for authorization
      * @throws AuthorizationFailedException : If token is invalid you get authorization failed
-     *     response
-     * @throws SaveAddressException : If userid is invalid or not found
+     *                                      response
+     * @throws SaveAddressException         : If userid is invalid or not found
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(AddressEntity addressEntity, final String flatBuildingName, final String locality, final String city,
@@ -44,24 +44,24 @@ public class AddressService {
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
         CustomerAuthEntity customerAuthEntity = this.customerAuthDao.getCustomerAuthByToken(accessToken);
 
-        if(customerAuthEntity == null) {
+        if (customerAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
 
-        if (customerAuthEntity.getLogoutAt() != null &&(customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
+        if (customerAuthEntity.getLogoutAt() != null && (customerAuthEntity.getLogoutAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
 
-        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
-        if ((flatBuildingName.length()==0)||(locality.length()==0)||
-                (city.length()==0)||(pinCode.length()==0) || (stateUuid.length()==0)) {
+        if ((flatBuildingName.length() == 0) || (locality.length() == 0) ||
+                (city.length() == 0) || (pinCode.length() == 0) || (stateUuid.length() == 0)) {
             throw new SaveAddressException("SAR-001", "No field can be empty");
         }
 
-        if(!(isValidPinCode(pinCode))){
+        if (!(isValidPinCode(pinCode))) {
             throw new SaveAddressException("SAR-002", "Invalid pincode");
         }
 
@@ -96,7 +96,7 @@ public class AddressService {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get all questions");
         }
 
-        if(customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        if (customerAuthEntity != null && customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
@@ -122,7 +122,7 @@ public class AddressService {
         } else if (customerAuthEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException(
                     "ATHR-002", "User is signed out.Sign in first to get all questions");
-        }else if(customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))){
+        } else if (customerAuthEntity.getExpiresAt() != null && (customerAuthEntity.getExpiresAt().isBefore(ZonedDateTime.now()))) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
@@ -135,8 +135,8 @@ public class AddressService {
             throw new AuthorizationFailedException(
                     "ATHR-004", "You are not authorized to view/update/delete any one else's address ");
         }
-        if(addressId.length()==0){
-            throw new AddressNotFoundException("ANF-005","Address id can not be empty");
+        if (addressId.length() == 0) {
+            throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
         }
 
         addressDao.deleteAddress(addressEntity);
