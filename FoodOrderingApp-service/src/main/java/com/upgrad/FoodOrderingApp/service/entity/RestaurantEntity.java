@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Table(name = "restaurant")
 @NamedQueries({
         @NamedQuery(name = "getAllRestaurants", query = "select r from RestaurantEntity r"),
+        @NamedQuery(name = "restaurantsByRating",query = "SELECT r FROM RestaurantEntity r order by  r.customerRating desc"),
         @NamedQuery(name = "getRestaurantsByName", query = "select r from RestaurantEntity r where LOWER(r.restaurantName) like concat('%',:restaurantName,'%')"),
         @NamedQuery(name = "getRestaurantById", query = "select r from RestaurantEntity r where r.uuid = :uuid")
 })

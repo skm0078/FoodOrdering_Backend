@@ -40,7 +40,7 @@ public class ItemController {
      */
     @RequestMapping(method = RequestMethod.GET, path = "/item/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<ItemList>> getTopFiveItemsByPopularity(@PathVariable("restaurant_id") final String restaurantId) throws RestaurantNotFoundException {
-        RestaurantEntity restaurantEntity = restaurantService.getRestaurantByUUID(restaurantId);
+        RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
 
         List<ItemEntity> itemEntities = itemService.getItemsByPopularity(restaurantEntity);
 

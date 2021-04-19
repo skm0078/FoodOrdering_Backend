@@ -97,7 +97,7 @@ public class OrderController {
                 addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
 
         RestaurantEntity restaurantEntity =
-                restaurantService.getRestaurantByUUID(saveOrderRequest.getRestaurantId().toString());
+                restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         OrderEntity ordersEntity = new OrderEntity();

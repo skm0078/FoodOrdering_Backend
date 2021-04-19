@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class RestaurantService {
      * @return -  RestaurantEntity
      * @exception - RestaurantNotFoundException.
      */
-    public RestaurantEntity getRestaurantByUUID(String restaurantId) throws RestaurantNotFoundException {
+    public RestaurantEntity restaurantByUUID(String restaurantId) throws RestaurantNotFoundException {
         if (restaurantId.isEmpty() || restaurantId == null) {
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
         }
@@ -99,19 +100,29 @@ public class RestaurantService {
      * @exception - InvalidRatingException.
      */
     @Transactional(propagation = Propagation.REQUIRED)
-    public RestaurantEntity updateRestaurantEntity(RestaurantEntity restaurantEntity, Double customerRating) throws InvalidRatingException {
+    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurantEntity, Double customerRating) throws InvalidRatingException {
         if (customerRating == null || customerRating < 1.0 || customerRating > 5.0) {
             throw new  InvalidRatingException("IRE-001", "Restaurant rating should be in the range of 1 to 5");
         }
+        DecimalFormat format = new DecimalFormat("##.0"); //keeping format to one decimal
         double currentRestaurantRating = restaurantEntity.getCustomerRating();
         Integer numberOfCustomersRated = restaurantEntity.getNumberOfCustomersRated();
 
         restaurantEntity.setNumberOfCustomersRated(numberOfCustomersRated + 1);
 
-        double newRating = ((currentRestaurantRating*numberOfCustomersRated)+customerRating)/numberOfCustomersRated;
-        restaurantEntity.setCustomerRating(newRating);
+        double newRating = ((currentRestaurantRating*numberOfCustomersRated.doubleValue())+customerRating)/numberOfCustomersRated;
+        restaurantEntity.setCustomerRating(Double.parseDouble(format.format(newRating)));
 
         RestaurantEntity updatedRestaurantEntity = restaurantDao.updateRestaurantRating(restaurantEntity);
         return updatedRestaurantEntity;
+    }
+
+    /** Test case
+    **/
+    public List<RestaurantEntity> restaurantsByRating(){
+
+        //Calls restaurantsByRating of restaurantDao to get list of RestaurantEntity
+        List<RestaurantEntity> restaurantEntities = restaurantDao.restaurantsByRating();
+        return restaurantEntities;
     }
 }

@@ -65,4 +65,12 @@ public class CategoryService {
         }
         return categoryEntities;
     }
+
+    /**
+     * Test case method
+     */
+    public List<CategoryEntity> getAllCategoriesOrderedByName() {
+        List<CategoryEntity> categoryEntities = categoryDao.getAllCategoriesOrderedByName();
+        return categoryEntities;
+    }
 }

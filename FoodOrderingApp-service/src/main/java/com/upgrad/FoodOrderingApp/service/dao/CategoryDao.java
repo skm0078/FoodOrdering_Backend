@@ -70,4 +70,16 @@ public class CategoryDao {
         }
     }
 
+    /**
+     * Test case method
+     */
+    public List<CategoryEntity> getAllCategoriesOrderedByName() {
+        try {
+            List<CategoryEntity> categoryEntities = entityManager.createNamedQuery("getAllCategoriesSortedByName",CategoryEntity.class).getResultList();
+            return categoryEntities;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
 }

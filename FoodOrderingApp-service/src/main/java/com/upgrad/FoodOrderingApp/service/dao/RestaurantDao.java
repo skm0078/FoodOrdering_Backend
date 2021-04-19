@@ -101,4 +101,14 @@ public class RestaurantDao {
         entityManager.merge(restaurantEntity);
         return restaurantEntity;
     }
+
+    //To get the list of restaurant by ratings from db
+    public List<RestaurantEntity> restaurantsByRating(){
+        try{
+            List<RestaurantEntity> restaurantEntities = entityManager.createNamedQuery("restaurantsByRating",RestaurantEntity.class).getResultList();
+            return restaurantEntities;
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
 }

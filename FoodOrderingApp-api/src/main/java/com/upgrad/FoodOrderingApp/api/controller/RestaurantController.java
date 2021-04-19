@@ -102,7 +102,7 @@ public class RestaurantController {
      */
     @RequestMapping(method = RequestMethod.GET, path = "/api/restaurant/{restaurant_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantByRestaurantId(@PathVariable("restaurant_id") final String restaurantId) throws RestaurantNotFoundException {
-        RestaurantEntity restaurantEntity = restaurantService.getRestaurantByUUID(restaurantId);
+        RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
 
         List<CategoryEntity> categoryEntities = categoryService.getCategoriesForRestaurant(restaurantEntity);
 
@@ -161,9 +161,9 @@ public class RestaurantController {
 
         CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
-        RestaurantEntity restaurantEntity = restaurantService.getRestaurantByUUID(restaurantId);
+        RestaurantEntity restaurantEntity = restaurantService.restaurantByUUID(restaurantId);
 
-        RestaurantEntity updatedRestaurantEntity = restaurantService.updateRestaurantEntity(restaurantEntity, customerRating);
+        RestaurantEntity updatedRestaurantEntity = restaurantService.updateRestaurantRating(restaurantEntity, customerRating);
 
         RestaurantUpdatedResponse restaurantUpdatedResponse = new RestaurantUpdatedResponse()
                                                                     .id(UUID.fromString(restaurantId))
