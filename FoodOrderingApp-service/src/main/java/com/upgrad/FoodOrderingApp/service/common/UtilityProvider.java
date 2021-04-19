@@ -86,8 +86,8 @@ public class UtilityProvider {
             throw new SignUpRestrictedException(
                     "SGR-005", "Except last name all fields should be filled");
         }
-        if (customerEntity.getContact_number() == null
-                || customerEntity.getContact_number().equals("")) {
+        if (customerEntity.getContactNumber() == null
+                || customerEntity.getContactNumber().equals("")) {
             throw new SignUpRestrictedException(
                     "SGR-005", "Except last name all fields should be filled");
         }

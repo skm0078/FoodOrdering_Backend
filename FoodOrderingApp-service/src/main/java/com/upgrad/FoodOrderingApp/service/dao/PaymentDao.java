@@ -13,6 +13,11 @@ public class PaymentDao {
 
     @PersistenceContext EntityManager entityManager;
 
+    /**
+     * Fetch all payments methods
+     *
+     * @return List<PaymentEntity>
+     */
     public List<PaymentEntity> getAllPaymentMethods() {
         try {
             return entityManager
@@ -23,6 +28,12 @@ public class PaymentDao {
         }
     }
 
+    /**
+     * Fetch payment entity based pn payment uuid
+     *
+     * @param uuid: payment uuid
+     * @return PaymentEntity
+     */
     public PaymentEntity getPaymentByUUID(String uuid) {
         try {
             return entityManager

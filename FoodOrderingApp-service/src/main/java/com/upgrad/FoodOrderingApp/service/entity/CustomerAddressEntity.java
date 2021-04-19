@@ -18,7 +18,10 @@ import javax.persistence.*;
         @NamedQuery(name = "customerByAddress",
                 query = "select u.customerEntity from CustomerAddressEntity u where u.addressEntity=:addressEntity"),
         @NamedQuery(name = "customerAddById",
-                query = "select u from CustomerAddressEntity u where u.id=:id")
+                query = "select u from CustomerAddressEntity u where u.id=:id"),
+        @NamedQuery(
+                name = "getCustomerAddressByAddress",
+                query = "select cae from CustomerAddressEntity cae where cae.addressEntity = :addressEntity")
 })
 public class CustomerAddressEntity {
 

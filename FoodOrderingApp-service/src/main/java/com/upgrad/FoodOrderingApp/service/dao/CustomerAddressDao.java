@@ -65,4 +65,24 @@ public class CustomerAddressDao {
             return null;
         }
     }
+
+    /**
+     * Fetch customer address by address
+     *
+     * @param addressEntity: AddressEntity
+     * @return CustomerAddressEntity
+     */
+    public CustomerAddressEntity getCustomerAddressByAddress(AddressEntity addressEntity) {
+        try {
+            CustomerAddressEntity customerAddressEntity =
+                    entityManager
+                            .createNamedQuery("getCustomerAddressByAddress", CustomerAddressEntity.class)
+                            .setParameter("addressEntity", addressEntity)
+                            .getSingleResult();
+            return customerAddressEntity;
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
 }

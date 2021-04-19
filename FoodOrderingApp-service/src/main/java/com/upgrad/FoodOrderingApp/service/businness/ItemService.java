@@ -1,18 +1,33 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
+import com.upgrad.FoodOrderingApp.service.common.UtilityProvider;
 import com.upgrad.FoodOrderingApp.service.dao.ItemDao;
+import com.upgrad.FoodOrderingApp.service.dao.OrderDao;
+import com.upgrad.FoodOrderingApp.service.dao.OrderItemDao;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ItemService {
 
     @Autowired
     private ItemDao itemDao;
+
+    @Autowired
+    private OrderDao orderDao;
+
+    @Autowired
+    private OrderItemDao orderItemDao;
+
+    @Autowired
+    UtilityProvider utilityProvider;
+
 
     /**
      * This method receives category entity.
@@ -42,7 +57,7 @@ public class ItemService {
      * @return -  ItemEntity object
      * @exception - none.
      */
-    private ItemEntity getItemByUUID(String itemId) {
+    public ItemEntity getItemByUUID(String itemId) {
         return itemDao.getItemById(itemId);
     }
 
@@ -83,7 +98,36 @@ public class ItemService {
      * @exception - none.
      */
     public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity) {
+        List<OrderEntity> orderEntities = orderDao.getOrdersByRestaurant(restaurantEntity);
         List<ItemEntity> itemEntities = new ArrayList<>();
-        return itemEntities;
+
+        orderEntities.forEach(ordersEntity -> {
+            List <OrderItemEntity> orderItemEntities = orderItemDao.getItemsByOrders(ordersEntity);
+            orderItemEntities.forEach(orderItemEntity -> {
+                itemEntities.add(orderItemEntity.getItem());
+            });
+        });
+
+        Map<String,Integer> itemCountMap = new HashMap<String,Integer>();
+        itemEntities.forEach(itemEntity -> {
+            Integer count = itemCountMap.get(itemEntity.getUuid());
+            itemCountMap.put(itemEntity.getUuid(),(count == null) ? 1 : count+1);
+        });
+
+        Map<String,Integer> sortedItemCountMap = utilityProvider.sortMapByValues(itemCountMap);
+
+        //Get top 5 items
+        List<ItemEntity> topItemEntites = new ArrayList<>();
+        Integer count = 0;
+        for(Map.Entry<String,Integer> item:sortedItemCountMap.entrySet()){
+            if(count < 5) {
+                topItemEntites.add(itemDao.getItemById(item.getKey()));
+                count = count+1;
+            }else{
+                break;
+            }
+        }
+
+        return topItemEntites;
     }
 }

@@ -14,7 +14,12 @@ public class CouponDao {
 
     @PersistenceContext private EntityManager entityManager;
 
-    // To get Coupon by Coupon Name from the db
+    /**
+     * Fetch coupons by coupon name
+     *
+     * @param couponName: Coupon name
+     * @return CouponEntity
+     */
     public CouponEntity getCouponByCouponName(String couponName) {
         try {
             CouponEntity couponEntity =
@@ -28,7 +33,12 @@ public class CouponDao {
         }
     }
 
-    // To get Coupon By Coupon Id from the db
+    /**
+     * Fetch coupons by coupon id
+     *
+     * @param couponUuid: coupon uuid
+     * @return CouponEntity
+     */
     public CouponEntity getCouponByCouponId(String couponUuid) {
         try {
             CouponEntity couponEntity =

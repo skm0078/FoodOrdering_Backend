@@ -49,4 +49,21 @@ public class CustomerAuthDao {
     public void updateCustomerAuth(final CustomerAuthEntity updatedCustomerAuthEntity) {
         entityManager.merge(updatedCustomerAuthEntity);
     }
+
+    /**
+     * Fetch customer auth using customer id
+     *
+     * @param customerId: customer id
+     * @return CustomerAuthEntity
+     */
+    public CustomerAuthEntity getCustomerAuthByCustomerId(final Integer customerId) {
+        try {
+            return entityManager
+                    .createNamedQuery("customerAuthByCustomerId", CustomerAuthEntity.class)
+                    .setParameter("customerId", customerId)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 }

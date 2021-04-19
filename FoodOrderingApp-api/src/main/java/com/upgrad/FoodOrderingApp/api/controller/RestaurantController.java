@@ -2,9 +2,11 @@ package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -32,6 +34,9 @@ public class RestaurantController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private CustomerService customerService;
 
     /**
      * This method is used to get all the restaurants.
@@ -144,16 +149,17 @@ public class RestaurantController {
      */
     /**
      * @param restaurantId - restaurant uuid
-     * @param accessToken - accessToken received from the request header
+     * @param authToken - accessToken received from the request header
      * @param customerRating - customer rating
      * @return -  ResponseEntity object
      * @exception - RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException
      */
     @RequestMapping(method = RequestMethod.PUT, path = "/api/restaurant/{restaurant_id}", params = "customer_rating", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@PathVariable("restaurant_id") final String restaurantId, @RequestHeader("authorization") final String accessToken, @RequestParam(value = "customer_rating") final Double customerRating) throws RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException {
-        /*
-        Need to perform customer auth token validation
-         */
+    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantDetails(@PathVariable("restaurant_id") final String restaurantId, @RequestHeader("authorization") final String authToken, @RequestParam(value = "customer_rating") final Double customerRating) throws RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException {
+
+        final String accessToken = authToken.split("Bearer ")[1];
+
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         RestaurantEntity restaurantEntity = restaurantService.getRestaurantByUUID(restaurantId);
 

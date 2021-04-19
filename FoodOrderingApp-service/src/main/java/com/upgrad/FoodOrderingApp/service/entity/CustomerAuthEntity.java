@@ -20,7 +20,10 @@ import java.time.ZonedDateTime;
                 name = "customerAuthByAccessToken",
                 query = "select u from CustomerAuthEntity u where u.accessToken=:accessToken"),
         @NamedQuery(name = "logoutAtByAccessToken",
-                query = "select u.logoutAt from CustomerAuthEntity u where u.accessToken=:accessToken")
+                query = "select u.logoutAt from CustomerAuthEntity u where u.accessToken=:accessToken"),
+        @NamedQuery(
+                name = "customerAuthByCustomerId",
+                query = "select u from CustomerAuthEntity u where u.customerEntity.id = :customerId")
 })
 /*@NamedNativeQueries({ @NamedNativeQuery(name = "@SQL_GET_ALL_ADDRESS",
         query = "select emp_id, address_line1, city, zipcode from Address") })*/

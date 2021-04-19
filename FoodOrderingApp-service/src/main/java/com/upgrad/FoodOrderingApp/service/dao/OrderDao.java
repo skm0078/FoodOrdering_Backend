@@ -18,13 +18,23 @@ public class OrderDao {
 
     @PersistenceContext private EntityManager entityManager;
 
-    // To save Order in the db
+    /**
+     * Presist order in db
+     *
+     * @param ordersEntity: OrderEntity
+     * @return OrderEntity
+     */
     public OrderEntity saveOrder(OrderEntity ordersEntity) {
         entityManager.persist(ordersEntity);
         return ordersEntity;
     }
 
-    // To get List of order from the db Corresponding to Customers
+    /**
+     * Fetch orders belonging to a customer
+     *
+     * @param customerEntity: CustomerEntity
+     * @return List<OrderEntity>
+     */
     public List<OrderEntity> getOrdersByCustomers(CustomerEntity customerEntity) {
         try {
             List<OrderEntity> ordersEntities =
@@ -38,7 +48,12 @@ public class OrderDao {
         }
     }
 
-    // To get list of OrdersEntity by the restaurant if no result then null is returned
+    /**
+     * Fetch order by restaurants
+     *
+     * @param restaurantEntity: RestaurantEntity
+     * @return List<OrderEntity>
+     */
     public List<OrderEntity> getOrdersByRestaurant(RestaurantEntity restaurantEntity) {
         try {
             List<OrderEntity> ordersEntities =
@@ -52,7 +67,12 @@ public class OrderDao {
         }
     }
 
-    // To get all the order corresponding to the address
+    /**
+     * Fetch order by address
+     *
+     * @param addressEntity: AddressEntity
+     * @return List<OrderEntity>
+     */
     public List<OrderEntity> getOrdersByAddress(AddressEntity addressEntity) {
         try {
             List<OrderEntity> ordersEntities =

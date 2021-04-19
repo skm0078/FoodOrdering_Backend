@@ -16,7 +16,12 @@ public class OrderItemDao {
 
     @PersistenceContext private EntityManager entityManager;
 
-    // To get the
+    /**
+     * Fetch items based on orders
+     *
+     * @param ordersEntity: OrderEntity
+     * @return List<OrderItemEntity>
+     */
     public List<OrderItemEntity> getItemsByOrders(OrderEntity ordersEntity) {
         try {
             List<OrderItemEntity> orderItemEntities =
@@ -30,11 +35,23 @@ public class OrderItemDao {
         }
     }
 
+    /**
+     * Persist the order item
+     *
+     * @param orderItemEntity: OrderItemEntity
+     * @return OrderItemEntity
+     */
     public OrderItemEntity saveOrderItem(OrderItemEntity orderItemEntity) {
         entityManager.persist(orderItemEntity);
         return orderItemEntity;
     }
 
+    /**
+     * Fetch order items by order
+     *
+     * @param ordersEntity: OrderEntity
+     * @return List<OrderItemEntity>
+     */
     public List<OrderItemEntity> getOrderItemsByOrder(OrderEntity ordersEntity) {
         try {
             List<OrderItemEntity> orderItemEntities =

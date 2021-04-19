@@ -22,6 +22,13 @@ public class PaymentController {
 
     @Autowired PaymentService paymentService;
 
+    /**
+     * This method is used to get fetch all payment methods.
+     */
+    /**
+     * @return -  ResponseEntity object
+     * @exception - none
+     */
     @RequestMapping(
             method = RequestMethod.GET,
             path = "/payment",

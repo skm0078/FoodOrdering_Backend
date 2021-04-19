@@ -12,10 +12,26 @@ import java.util.List;
 public class PaymentService {
     @Autowired PaymentDao paymentDao;
 
+    /**
+     * This method is to fetch list of all payment methods.
+     */
+    /**
+     * @return -  List<PaymentEntity>
+     * @exception - none.
+     */
     public List<PaymentEntity> getAllPaymentMethods() {
         return paymentDao.getAllPaymentMethods();
     }
 
+    /**
+     * This method receives payment method uuid.
+     * This method is to fetch payment method based on uuid.
+     */
+    /**
+     * @param uuid - payment uuid
+     * @return -  PaymentEntity
+     * @exception - PaymentMethodNotFoundException.
+     */
     public PaymentEntity getPaymentByUUID(String uuid) throws PaymentMethodNotFoundException {
         PaymentEntity paymentEntity = paymentDao.getPaymentByUUID(uuid);
         if (paymentEntity == null) { // Checking if Payment entity is null

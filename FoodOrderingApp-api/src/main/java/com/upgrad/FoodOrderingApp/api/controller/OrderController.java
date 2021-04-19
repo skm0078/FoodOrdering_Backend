@@ -33,6 +33,13 @@ public class OrderController {
 
     @Autowired ItemService itemService;
 
+    /**
+     * This method is used to get fetch coupons by coupon name.
+     */
+    /**
+     * @return -  ResponseEntity object
+     * @exception - AuthorizationFailedException, CouponNotFoundException
+     */
     @CrossOrigin
     @RequestMapping(
             method = RequestMethod.GET,
@@ -58,6 +65,13 @@ public class OrderController {
         return new ResponseEntity<CouponDetailsResponse>(couponDetailsResponse, HttpStatus.OK);
     }
 
+    /**
+     * This method is used to save order.
+     */
+    /**
+     * @return -  ResponseEntity object
+     * @exception - AuthorizationFailedException, PaymentMethodNotFoundException, AddressNotFoundException, RestaurantNotFoundException, CouponNotFoundException
+     */
     @CrossOrigin
     @RequestMapping(
             method = RequestMethod.POST,
@@ -83,7 +97,7 @@ public class OrderController {
                 addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
 
         RestaurantEntity restaurantEntity =
-                restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
+                restaurantService.getRestaurantByUUID(saveOrderRequest.getRestaurantId().toString());
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         OrderEntity ordersEntity = new OrderEntity();
@@ -119,6 +133,13 @@ public class OrderController {
         return new ResponseEntity<SaveOrderResponse>(saveOrderResponse, HttpStatus.CREATED);
     }
 
+    /**
+     * This method is used to get past orders of user.
+     */
+    /**
+     * @return -  ResponseEntity object
+     * @exception - none
+     */
     @CrossOrigin
     @RequestMapping(
             method = RequestMethod.GET,
@@ -149,8 +170,7 @@ public class OrderController {
                                             .itemPrice(orderItemEntity.getItem().getPrice())
                                             .id(UUID.fromString(orderItemEntity.getItem().getUuid()))
                                             .type(
-                                                    ItemQuantityResponseItem.TypeEnum.valueOf(
-                                                            orderItemEntity.getItem().getType().getValue()));
+                                                    ItemQuantityResponseItem.TypeEnum.fromValue(orderItemEntity.getItem().getType().equals("0") ? "VEG" : "NON_VEG"));
                             ItemQuantityResponse itemQuantityResponse =
                                     new ItemQuantityResponse()
                                             .item(itemQuantityResponseItem)
@@ -161,8 +181,8 @@ public class OrderController {
                 OrderListAddressState orderListAddressState = new OrderListAddressState();
                 try {
                     orderListAddressState.setId(
-                            UUID.fromString(ordersEntity.getAddress().getState().getUuid()));
-                    orderListAddressState.stateName(ordersEntity.getAddress().getState().getState_name());
+                            UUID.fromString(ordersEntity.getAddress().getStateEntity().getUuid()));
+                    orderListAddressState.stateName(ordersEntity.getAddress().getStateEntity().getStateName());
                 } catch (Exception e) {
                     orderListAddressState.setId(null);
                     orderListAddressState.stateName(null);
@@ -172,7 +192,7 @@ public class OrderController {
                 try {
                     orderListAddress
                             .id(UUID.fromString(ordersEntity.getAddress().getUuid()))
-                            .flatBuildingName(ordersEntity.getAddress().getFlatBuilNo())
+                            .flatBuildingName(ordersEntity.getAddress().getFlatNumber())
                             .locality(ordersEntity.getAddress().getLocality())
                             .city(ordersEntity.getAddress().getCity())
                             .pincode(ordersEntity.getAddress().getPincode())
@@ -204,7 +224,7 @@ public class OrderController {
                             .firstName(ordersEntity.getCustomer().getFirstName())
                             .lastName(ordersEntity.getCustomer().getLastName())
                             .emailAddress(ordersEntity.getCustomer().getEmail())
-                            .contactNumber(ordersEntity.getCustomer().getContact_number());
+                            .contactNumber(ordersEntity.getCustomer().getContactNumber());
                 } catch (Exception e) {
                     orderListCustomer
                             .id(null)
