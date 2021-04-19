@@ -13,10 +13,12 @@ import javax.persistence.*;
 @Table(name = "customer_address")
 @NamedQueries({
         @NamedQuery(
-                name = "customerAddByCustomerContact",
-                query = "select u from CustomerEntity u where u.contactNumber=:contactNumber"),
-        @NamedQuery(name = "customerAddByEmail", query = "select u from CustomerEntity u where u.email=:email"),
-        @NamedQuery(name = "customerAddByCustomerId", query = "select u from CustomerEntity u where u.uuid=:customerId")
+                name = "addressByCustomer",
+                query = "select u.addressEntity from CustomerAddressEntity u where u.customerEntity=:customerEntity"),
+        @NamedQuery(name = "customerByAddress",
+                query = "select u.customerEntity from CustomerAddressEntity u where u.addressEntity=:addressEntity"),
+        @NamedQuery(name = "customerAddById",
+                query = "select u from CustomerAddressEntity u where u.id=:id")
 })
 public class CustomerAddressEntity {
 

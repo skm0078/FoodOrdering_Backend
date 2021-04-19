@@ -131,14 +131,13 @@ public class AddressService {
             throw new AddressNotFoundException("ANF-003", "No address by this id");
         }
 
-        if (!addressEntity.getCustomerEntity().getUuid().equals(customerAuthEntity.getCustomerEntity().getUuid())) {
+        if (!customerAddressDao.getCustomerByAddress(addressEntity).getUuid().equals(customerAuthEntity.getCustomerEntity().getUuid())) {
             throw new AuthorizationFailedException(
                     "ATHR-004", "You are not authorized to view/update/delete any one else's address ");
         }
         if(addressId.length()==0){
             throw new AddressNotFoundException("ANF-005","Address id can not be empty");
         }
-
 
         addressDao.deleteAddress(addressEntity);
         return addressEntity;
